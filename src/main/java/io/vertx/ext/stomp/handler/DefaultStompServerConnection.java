@@ -46,7 +46,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     private final Vertx vertx;
     private final StompServerOptions options;
     private final StompServerHandler stompServerHandler;
-    private final UUID session;
 
     private boolean connected = false;
     private boolean closed = false;
@@ -63,12 +62,11 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         this.serverWebSocket = serverWebSocket;
         this.vertx = vertx;
         this.options = options;
-        this.session = UUID.randomUUID();
 
         // Create new handler to do the bulk of the work..
         this.stompServerHandler = factory.create(this);
 
-        log.debug("New Stomp Connection, Session: " + session);
+        log.debug("New Stomp Connection "+serverWebSocket.remoteAddress().host());
     }
 
     @Override
@@ -79,11 +77,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     @Override
     public String textHandlerID() {
         return serverWebSocket.textHandlerID();
-    }
-
-    @Override
-    public UUID session() {
-        return session;
     }
 
     @Override
@@ -118,7 +111,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         if(!closed) {
 
             if(log.isDebugEnabled()) {
-                log.debug("Closing Stomp Connection, Session: " + session);
+                log.debug("Closing Stomp Connection "+serverWebSocket.remoteAddress().host());
             }
 
             connected = false;
@@ -224,7 +217,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                         throw new IllegalStateException("Unknown command");
                 }
             } catch (Exception e) {
-                log.debug("Exception processing frame", e);
+                log.error("Exception processing frame", e);
                 write(Frames.createInvalidFrameErrorFrame(e, options.isDebugEnabled()));
                 close();
             }
@@ -251,8 +244,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         String version = negotiate(accepted);
         if (version == null) {
             // Spec says: if the server and the client do not share any common protocol versions, then the server MUST respond with an error.
-            throw new IllegalStateException(
-                    "Client protocol requirement does not mach versions supported by the server.");
+            throw new IllegalStateException("Client protocol requirement does not mach versions supported by the server.");
         }
 
         // Now authenticate client with supplied credentials
@@ -264,11 +256,12 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             stompServerHandler.authenticate(login, passcode).setHandler(event -> {
 
                 if (event.succeeded()) {
+
                     // Spec says: The server will respond back with the highest version of the protocol -> version
                     write(new Frame(Frame.Command.CONNECTED, Headers.create(
                             Frame.VERSION, version,
                             Frame.SERVER, "Continuum",
-                            Frame.SESSION, session().toString(),
+                            Frame.SESSION, event.result(),
                             Frame.HEARTBEAT, Frame.Heartbeat.create(options.getHeartbeat()).toString()), null));
 
 

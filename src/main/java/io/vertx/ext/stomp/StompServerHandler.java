@@ -25,7 +25,15 @@ import io.vertx.core.Future;
  */
 public interface StompServerHandler {
 
-    Future<Void> authenticate(String user, String password);
+    /**
+     * Requests authentication for the given credentials
+     * @param login the identity information to use for authentication
+     * @param passcode the secret to use for authentication
+     * @return a {@link Future<String>} completed normally to authenticate or failed to represent a failed authentication
+     *         The future must contain a string that will be used as the session identifier
+     *         This allows the authenticator to perform authentication with the session if desired
+     */
+    Future<String> authenticate(String login, String passcode);
 
     void send(Frame frame);
 

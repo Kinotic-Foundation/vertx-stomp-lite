@@ -25,6 +25,8 @@ import io.vertx.ext.stomp.frame.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 /**
  *
  * Created by Navid Mitchell on 2019-02-05.
@@ -36,7 +38,7 @@ public class DefaultStompServerHandler implements StompServerHandler {
     private final StompServerConnection connection;
     private final Vertx vertx;
     private final EventBus eventBus;
-
+    private UUID session;
 
 
     public DefaultStompServerHandler(StompServerConnection connection,
@@ -47,8 +49,9 @@ public class DefaultStompServerHandler implements StompServerHandler {
     }
 
     @Override
-    public Future<Void> authenticate(String user, String password) {
-        return Future.succeededFuture();
+    public Future<String> authenticate(String login, String passcode) {
+        session = UUID.randomUUID();
+        return Future.succeededFuture(session.toString());
     }
 
     @Override

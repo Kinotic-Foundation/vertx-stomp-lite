@@ -16,21 +16,14 @@
 
 package io.vertx.ext.stomp;
 
-import io.vertx.ext.stomp.frame.Frame;
 import io.vertx.core.buffer.Buffer;
-import java.util.UUID;
+import io.vertx.ext.stomp.frame.Frame;
 
 /**
  *
  * Created by Navid Mitchell on 2019-01-10.
  */
 public interface StompServerConnection {
-
-    /**
-     * Unique identifier for this connection
-     * @return
-     */
-    UUID session();
 
     /**
      * When a {@code Websocket} is created it automatically registers an event handler with the event bus - the ID of that
