@@ -107,6 +107,8 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         return this;
     }
 
+    // FIXME: track clients that were closed because they were misbehaving and block re connection
+    // An example is where the client keeps trying to subscribe to un authorized destination..
     public void close() {
         if(!closed) {
 
@@ -158,6 +160,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     public void handle(Frame frame) {
         if(!closed) {
             try {
+                // TODO: should we verify required headers before dispatching call to handler?
                 switch (frame.getCommand()) {
                     case CONNECT:
                         onConnect(frame);
@@ -260,7 +263,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                     // Spec says: The server will respond back with the highest version of the protocol -> version
                     write(new Frame(Frame.Command.CONNECTED, Headers.create(
                             Frame.VERSION, version,
-                            Frame.SERVER, "Continuum",
                             Frame.SESSION, event.result(),
                             Frame.HEARTBEAT, Frame.Heartbeat.create(options.getHeartbeat()).toString()), null));
 
@@ -270,9 +272,12 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                     Frame.Heartbeat serverHeartbeat = Frame.Heartbeat.create(options.getHeartbeat());
                     long clientHeartbeatPeriod = Frame.Heartbeat.computeClientHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
                     long serverHeartbeatPeriod = Frame.Heartbeat.computeServerHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
+
+                    onClientActivity();
+
                     configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
 
-                    log.debug("Stomp connected");
+                    log.debug("Stomp connected "+serverWebSocket.remoteAddress().host());
 
                     connected = true;
                 } else {
