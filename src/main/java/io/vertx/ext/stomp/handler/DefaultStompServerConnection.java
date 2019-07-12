@@ -266,7 +266,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                             Frame.SESSION, event.result(),
                             Frame.HEARTBEAT, Frame.Heartbeat.create(options.getHeartbeat()).toString()), null));
 
-
                     // now that we are connected Compute heartbeat, and register serverHeartbeat and clientHeartbeat
                     Frame.Heartbeat clientHeartbeat = Frame.Heartbeat.parse(frame.getHeader(Frame.HEARTBEAT));
                     Frame.Heartbeat serverHeartbeat = Frame.Heartbeat.create(options.getHeartbeat());
