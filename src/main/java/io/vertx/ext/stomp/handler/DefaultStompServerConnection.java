@@ -276,7 +276,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
 
                     configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
 
-                    log.debug("Stomp connected "+serverWebSocket.remoteAddress().host());
+                    log.debug("Stomp connected. Host: "+serverWebSocket.remoteAddress().host());
 
                     connected = true;
                 } else {
