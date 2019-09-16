@@ -4,3 +4,6 @@
 
 ### IntelliJ IDEA ###
 /out/
+
+### MAC SPECIFIC ###
+*.DS_Store
