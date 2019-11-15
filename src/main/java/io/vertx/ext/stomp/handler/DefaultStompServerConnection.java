@@ -256,7 +256,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
 
         if (login != null && !login.isBlank() && passcode != null && !passcode.isBlank()) {
 
-            stompServerHandler.authenticate(login, passcode).setHandler(event -> {
+            stompServerHandler.authenticate(login, passcode, frame.getHeaders()).setHandler(event -> {
 
                 if (event.succeeded()) {
 

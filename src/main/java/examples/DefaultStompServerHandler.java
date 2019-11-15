@@ -25,6 +25,7 @@ import io.vertx.ext.stomp.frame.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -49,7 +50,7 @@ public class DefaultStompServerHandler implements StompServerHandler {
     }
 
     @Override
-    public Future<String> authenticate(String login, String passcode) {
+    public Future<String> authenticate(String login, String passcode, Map<String, String> headers) {
         session = UUID.randomUUID();
         return Future.succeededFuture(session.toString());
     }
