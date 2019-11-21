@@ -71,11 +71,18 @@ public interface StompServerConnection {
     StompServerConnection handleReceipt(Frame frame);
 
     /**
-     * Sends an error frame to the client and then disconnects the client per the Stomp Spec
+     * Sends an error frame to the client and leaves the client connected
      * @param throwable the error that occurred
      * @return this
      */
     StompServerConnection sendError(Throwable throwable);
+
+    /**
+     * Sends an error frame to the client and then disconnects the client per the Stomp Spec
+     * @param throwable the error that occurred
+     * @return this
+     */
+    StompServerConnection sendErrorAndDisconnect(Throwable throwable);
 
     /**
      * Closes the connection with the client.

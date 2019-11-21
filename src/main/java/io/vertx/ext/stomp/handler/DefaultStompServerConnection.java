@@ -103,6 +103,12 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     @Override
     public StompServerConnection sendError(Throwable throwable) {
         write(Frames.createErrorFrame(throwable, options.isDebugEnabled()));
+        return this;
+    }
+
+    @Override
+    public StompServerConnection sendErrorAndDisconnect(Throwable throwable) {
+        sendError(throwable);
         close();
         return this;
     }
