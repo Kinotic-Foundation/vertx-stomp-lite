@@ -69,7 +69,9 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         // Create new handler to do the bulk of the work..
         this.stompServerHandler = factory.create(this);
 
-        log.debug("New Stomp Connection "+serverWebSocket.remoteAddress().host());
+        if(log.isDebugEnabled()){
+            log.debug("New Stomp Connection "+serverWebSocket.remoteAddress().host());
+        }
     }
 
     @Override
