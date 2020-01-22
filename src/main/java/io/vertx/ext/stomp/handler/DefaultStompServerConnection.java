@@ -285,7 +285,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             } else {
                 write(Frames.createErrorFrame("Authentication failed",
                                               Collections.emptyMap(),
-                                              "The connection frame does not contain valid credentials"));
+                                              event.cause().getMessage()));
                 close();
             }
         });
