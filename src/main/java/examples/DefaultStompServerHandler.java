@@ -16,7 +16,7 @@
 
 package examples;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.ext.stomp.StompServerConnection;
@@ -25,6 +25,7 @@ import io.vertx.ext.stomp.frame.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,9 +51,10 @@ public class DefaultStompServerHandler implements StompServerHandler {
     }
 
     @Override
-    public Future<String> authenticate(String login, String passcode, Map<String, String> headers) {
-        session = UUID.randomUUID();
-        return Future.succeededFuture(session.toString());
+    public Promise<Map<String, String>> authenticate(Map<String, String> connectHeaders) {
+        Promise<Map<String,String>> ret =  Promise.promise();
+        ret.complete(Collections.singletonMap(Frame.SESSION, UUID.randomUUID().toString()));
+        return ret;
     }
 
     @Override

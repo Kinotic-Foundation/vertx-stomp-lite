@@ -16,7 +16,7 @@
 
 package io.vertx.ext.stomp;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.ext.stomp.frame.Frame;
 
 import java.util.Map;
@@ -29,14 +29,11 @@ public interface StompServerHandler {
 
     /**
      * Requests authentication for the given credentials
-     * @param login the identity information to use for authentication
-     * @param passcode the secret to use for authentication
-     * @param headers all of the headers provided with the CONNECT frame. This will include the login and passcode headers.
-     * @return a {@link Future<String>} completed normally to authenticate or failed to represent a failed authentication
-     *         The future must contain a string that will be used as the session identifier
-     *         This allows the authenticator to perform authentication with the session if desired
+     * @param connectHeaders all of the headers provided with the CONNECT frame. This will include the login and passcode headers.
+     * @return a {@link Promise<Map>} completed normally to authenticate or failed to represent a failed authentication
+     *         The promise must contain a Map that will provide any additional headers to be returned to the client with the CONNECTED frame
      */
-    Future<String> authenticate(String login, String passcode, Map<String, String> headers);
+    Promise<Map<String, String>> authenticate(Map<String, String> connectHeaders);
 
     void send(Frame frame);
 

@@ -12,7 +12,7 @@ repositories {
 }
 
 ext {
-    vertxVersion='3.8.3'
+    vertxVersion='3.8.4'
     logbackVersion='1.2.3'
     apacheCommonsVersion='3.9'
 }

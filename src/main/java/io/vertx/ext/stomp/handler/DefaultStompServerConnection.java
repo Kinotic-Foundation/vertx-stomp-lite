@@ -16,6 +16,10 @@
 
 package io.vertx.ext.stomp.handler;
 
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.ServerWebSocket;
 import io.vertx.ext.stomp.StompServerConnection;
 import io.vertx.ext.stomp.StompServerHandler;
 import io.vertx.ext.stomp.StompServerHandlerFactory;
@@ -24,14 +28,13 @@ import io.vertx.ext.stomp.frame.Frame;
 import io.vertx.ext.stomp.frame.FrameParser;
 import io.vertx.ext.stomp.frame.Frames;
 import io.vertx.ext.stomp.frame.Headers;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.ServerWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -257,46 +260,35 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         }
 
         // Now authenticate client with supplied credentials
-        String login = frame.getHeader(Frame.LOGIN);
-        String passcode = frame.getHeader(Frame.PASSCODE);
+        stompServerHandler.authenticate(frame.getHeaders()).future().setHandler(event -> {
 
-        if (login != null && !login.isBlank() && passcode != null && !passcode.isBlank()) {
+            if (event.succeeded()) {
+                Headers headers = Headers.create(event.result());
+                headers.add(Frame.VERSION, version); // Spec says: The server will respond back with the highest version of the protocol -> version
+                headers.add(Frame.HEARTBEAT, Frame.Heartbeat.create(options.getHeartbeat()).toString());
 
-            stompServerHandler.authenticate(login, passcode, frame.getHeaders()).setHandler(event -> {
+                write(new Frame(Frame.Command.CONNECTED, headers, null));
 
-                if (event.succeeded()) {
+                // now that we are connected Compute heartbeat, and register serverHeartbeat and clientHeartbeat
+                Frame.Heartbeat clientHeartbeat = Frame.Heartbeat.parse(frame.getHeader(Frame.HEARTBEAT));
+                Frame.Heartbeat serverHeartbeat = Frame.Heartbeat.create(options.getHeartbeat());
+                long clientHeartbeatPeriod = Frame.Heartbeat.computeClientHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
+                long serverHeartbeatPeriod = Frame.Heartbeat.computeServerHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
 
-                    // Spec says: The server will respond back with the highest version of the protocol -> version
-                    write(new Frame(Frame.Command.CONNECTED, Headers.create(
-                            Frame.VERSION, version,
-                            Frame.SESSION, event.result(),
-                            Frame.HEARTBEAT, Frame.Heartbeat.create(options.getHeartbeat()).toString()), null));
+                onClientActivity();
 
-                    // now that we are connected Compute heartbeat, and register serverHeartbeat and clientHeartbeat
-                    Frame.Heartbeat clientHeartbeat = Frame.Heartbeat.parse(frame.getHeader(Frame.HEARTBEAT));
-                    Frame.Heartbeat serverHeartbeat = Frame.Heartbeat.create(options.getHeartbeat());
-                    long clientHeartbeatPeriod = Frame.Heartbeat.computeClientHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
-                    long serverHeartbeatPeriod = Frame.Heartbeat.computeServerHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
+                configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
 
-                    onClientActivity();
+                log.debug("Stomp connected. Host: "+serverWebSocket.remoteAddress().host());
 
-                    configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
-
-                    log.debug("Stomp connected. Host: "+serverWebSocket.remoteAddress().host());
-
-                    connected = true;
-                } else {
-                    write(Frames.createErrorFrame("Authentication failed",
-                                                  Collections.emptyMap(),
-                                                  "The connection frame does not contain valid credentials"));
-                    close();
-                }
-
-            });
-
-        } else {
-            throw new IllegalStateException("The connection frame does not contain credentials");
-        }
+                connected = true;
+            } else {
+                write(Frames.createErrorFrame("Authentication failed",
+                                              Collections.emptyMap(),
+                                              "The connection frame does not contain valid credentials"));
+                close();
+            }
+        });
     }
 
     private String negotiate(List<String> accepted) {
