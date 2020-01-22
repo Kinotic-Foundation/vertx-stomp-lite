@@ -51,6 +51,13 @@ public interface StompServerHandler {
 
     void nack(Frame frame);
 
+    /**
+     * This is called when the processing of a client request resulted in an exception.
+     * Ex: parsing or handling of a STOMP frame resulted in an exception.
+     * @param t the exception that occurred
+     */
+    void exception(Throwable t);
+
     void disconnected();
 
 }

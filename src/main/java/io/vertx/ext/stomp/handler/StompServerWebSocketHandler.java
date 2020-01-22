@@ -16,13 +16,12 @@
 
 package io.vertx.ext.stomp.handler;
 
-import io.vertx.ext.stomp.frame.FrameParser;
-import io.vertx.ext.stomp.frame.Frames;
-import io.vertx.ext.stomp.StompServerHandlerFactory;
-import io.vertx.ext.stomp.StompServerOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.ext.stomp.StompServerHandlerFactory;
+import io.vertx.ext.stomp.StompServerOptions;
+import io.vertx.ext.stomp.frame.FrameParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,33 +47,30 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
 
     @Override
     public void handle(ServerWebSocket socket) {
+        DefaultStompServerConnection defaultStompServerConnection = new DefaultStompServerConnection(socket,
+                                                                                                     vertx,
+                                                                                                     options,
+                                                                                                     factory);
         if (!socket.path().equals(options.getWebsocketPath())) {
-            log.error("Receiving a web socket connection on an invalid path (" + socket.path() + "), the path is " +
-                      "configured to " + options.getWebsocketPath() + ". Rejecting connection");
+            String error = "Receiving a web socket connection on an invalid path (" + socket.path() + "), the path is "
+                             + "configured to " + options.getWebsocketPath() + ". Rejecting connection";
+            log.error(error);
 
             socket.reject();
 
+            defaultStompServerConnection.clientCausedException(new IllegalStateException(error), false);
         }else{
-
-            DefaultStompServerConnection defaultStompServerConnection = new DefaultStompServerConnection(socket,
-                                                                                                         vertx,
-                                                                                                         options,
-                                                                                                         factory);
 
             socket.exceptionHandler((exception) -> {
                 log.error("The STOMP server caught a WebSocket error - closing connection", exception);
-                defaultStompServerConnection.close();
+                defaultStompServerConnection.clientCausedException(exception, false);
             });
 
             socket.endHandler(v -> defaultStompServerConnection.close());
 
             FrameParser parser = new FrameParser(options);
-            parser.errorHandler((exception) -> {
-                // TODO: telemetry - keep track of this
-                defaultStompServerConnection.write(Frames.createInvalidFrameErrorFrame(exception, options.isDebugEnabled()));
-                defaultStompServerConnection.close();
-
-            }).handler(defaultStompServerConnection);
+            parser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(exception, true))
+                  .handler(defaultStompServerConnection);
 
             socket.handler(parser);
         }

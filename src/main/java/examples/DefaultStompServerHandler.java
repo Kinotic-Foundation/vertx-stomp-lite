@@ -98,6 +98,11 @@ public class DefaultStompServerHandler implements StompServerHandler {
     }
 
     @Override
+    public void exception(Throwable t) {
+        log.error("Exception processing frame", t);
+    }
+
+    @Override
     public void disconnected() {
         log.debug("Client disconnected");
     }

@@ -116,8 +116,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         return this;
     }
 
-    // FIXME: track clients that were closed because they were misbehaving and block re connection
-    // An example is where the client keeps trying to subscribe to un authorized destination..
+    // An example is where the client keeps trying to subscribe to unauthorized destination..
     public void close() {
         if(!closed) {
 
@@ -155,7 +154,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                 // Ignore it, the web socket has already been closed.
                 log.warn("Unknown Error closing serverWebSocket.",e);
             }
-
             closed = true;
         }
     }
@@ -225,15 +223,25 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                         onClientActivity(); // we just increment activity stomp pings do not expect a response
                         break;
                     default:
-                        // FIXME: blacklist client!!!
                         throw new IllegalStateException("Unknown command");
                 }
             } catch (Exception e) {
-                log.error("Exception processing frame", e);
-                write(Frames.createInvalidFrameErrorFrame(e, options.isDebugEnabled()));
-                close();
+                clientCausedException(e, true);
             }
         }
+    }
+
+    /**
+     * Used to signal that the processing of a frame resulted in an exception
+     * @param t the exception that was caused
+     * @param sendErrorFrame true if an ERROR frame should be sent to the client prior to closing it
+     */
+    public void clientCausedException(Throwable t, boolean sendErrorFrame){
+        stompServerHandler.exception(t);
+        if(sendErrorFrame) {
+            write(Frames.createInvalidFrameErrorFrame(t, options.isDebugEnabled()));
+        }
+        close();
     }
 
     private void ensureConnected() {
