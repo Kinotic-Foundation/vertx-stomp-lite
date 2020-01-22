@@ -17,6 +17,7 @@
 package io.vertx.ext.stomp.handler;
 
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
@@ -85,43 +86,80 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     }
 
     @Override
-    public StompServerConnection write(Frame frame) {
+    public Promise<Void> write(Frame frame) {
         return write(frame.toBuffer(options.isTrailingLine()));
     }
 
     @Override
-    public StompServerConnection write(Buffer buffer) {
-        serverWebSocket.writeBinaryMessage(buffer);
+    public Promise<Void> write(Buffer buffer) {
+        Promise<Void> ret = Promise.promise();
         onServerActivity();
-        return this;
+        try{
+            serverWebSocket.writeBinaryMessage(buffer, ret);
+        } catch (Exception e) {
+            ret.fail(e);
+        }
+        return ret;
     }
 
     @Override
-    public StompServerConnection handleReceipt(Frame frame) {
+    public Promise<Void> handleReceipt(Frame frame) {
+        Promise<Void> ret = Promise.promise();
         String receipt = frame.getReceipt();
         if (receipt != null) {
-            write(Frames.createReceiptFrame(receipt, Headers.create()));
+            write(Frames.createReceiptFrame(receipt, Headers.create()))
+                    .future()
+                    .setHandler(ret);
+        }else{
+            ret.complete();
         }
-        return this;
+        return ret;
     }
 
     @Override
-    public StompServerConnection sendError(Throwable throwable) {
-        write(Frames.createErrorFrame(throwable, options.isDebugEnabled()));
-        return this;
+    public Promise<Void> sendError(Throwable throwable) {
+        return write(Frames.createErrorFrame(throwable, options.isDebugEnabled()));
     }
 
     @Override
-    public StompServerConnection sendErrorAndDisconnect(Throwable throwable) {
-        sendError(throwable);
-        close();
-        return this;
+    public Promise<Void> sendErrorAndDisconnect(Throwable throwable) {
+        Promise<Void> ret = Promise.promise();
+        sendError(throwable)
+                .future()
+                .setHandler(event -> {
+                    // now that data was sent close connection and finish promise
+                    close();
+                    if (event.succeeded()){
+                        ret.complete();
+                    }else{
+                        ret.fail(event.cause());
+                    }
+                });
+        return ret;
+    }
+
+    /**
+     * Used to signal that the processing of a frame resulted in an exception
+     * @param t the exception that was caused
+     * @param sendErrorFrame true if an ERROR frame should be sent to the client prior to closing it
+     */
+    public void clientCausedException(Throwable t, boolean sendErrorFrame){
+        try {
+            stompServerHandler.exception(t);
+        } catch (Exception e) {
+            log.error("StompServerHandler.exception handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+        }
+        if(sendErrorFrame) {
+            logIfFailed(sendErrorAndDisconnect(t),
+                        "Problem sending ERROR frame to client");
+        }else{
+            close();
+        }
     }
 
     // An example is where the client keeps trying to subscribe to unauthorized destination..
     public void close() {
         if(!closed) {
-
             if(log.isDebugEnabled()) {
                 log.debug("Closing Stomp Connection "+serverWebSocket.remoteAddress().host());
             }
@@ -140,21 +178,16 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                 stompServerHandler.disconnected();
 
             } catch (Exception e) {
-                log.error("StompServerHandler unhandled error on disconnected", e);
+                log.error("StompServerHandler.disconnected() handler threw an exception.. You should fix your handler not to throw exceptions.", e);
             }
 
             try {
-
-                serverWebSocket.close();
-
-            }catch (IllegalStateException ise){
-                // We ignore errors if websocket is already closed
-                if(!ise.getMessage().equals("WebSocket is closed")){
-                    log.warn("Unknown IllegalStateException closing serverWebSocket.",ise);
+                if(!serverWebSocket.isClosed()) {
+                    serverWebSocket.close();
                 }
             } catch (Exception e) {
                 // Ignore it, the web socket has already been closed.
-                log.warn("Unknown Error closing serverWebSocket.",e);
+                log.warn("Error closing serverWebSocket.", e);
             }
             closed = true;
         }
@@ -169,7 +202,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     public void handle(Frame frame) {
         if(!closed) {
             try {
-                // TODO: should we verify required headers before dispatching call to handler?
                 switch (frame.getCommand()) {
                     case CONNECT:
                         onConnect(frame);
@@ -230,20 +262,9 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             } catch (Exception e) {
                 clientCausedException(e, true);
             }
+        } else {
+            log.error("THIS SHOULD NEVER HAPPEN!! Frame Handler called after close.");
         }
-    }
-
-    /**
-     * Used to signal that the processing of a frame resulted in an exception
-     * @param t the exception that was caused
-     * @param sendErrorFrame true if an ERROR frame should be sent to the client prior to closing it
-     */
-    public void clientCausedException(Throwable t, boolean sendErrorFrame){
-        stompServerHandler.exception(t);
-        if(sendErrorFrame) {
-            write(Frames.createInvalidFrameErrorFrame(t, options.isDebugEnabled()));
-        }
-        close();
     }
 
     private void ensureConnected() {
@@ -251,7 +272,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             throw new IllegalStateException("Client must provide a connect frame before any other frames");
         }
     }
-
 
     private void onConnect(Frame frame) {
         // Server negotiation
@@ -269,34 +289,47 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             throw new IllegalStateException("Client protocol requirement does not mach versions supported by the server.");
         }
 
-        // Now authenticate client with supplied credentials
-        stompServerHandler.authenticate(frame.getHeaders()).future().setHandler(event -> {
+        // Now authenticate client providing headers passed to CONNECT frame
+        stompServerHandler.authenticate(frame.getHeaders())
+                          .future()
+                          .setHandler(authenticatePromise -> {
 
-            if (event.succeeded()) {
-                Headers headers = Headers.create(event.result());
+            if (authenticatePromise.succeeded()) {
+
+                Headers headers = Headers.create(authenticatePromise.result());
                 headers.add(Frame.VERSION, version); // Spec says: The server will respond back with the highest version of the protocol -> version
                 headers.add(Frame.HEARTBEAT, Frame.Heartbeat.create(options.getHeartbeat()).toString());
 
-                write(new Frame(Frame.Command.CONNECTED, headers, null));
+                write(new Frame(Frame.Command.CONNECTED, headers, null))
+                    .future()
+                    .setHandler(writePromise -> {
+                        if(writePromise.succeeded()){
+                            // now that we are connected Compute heartbeat, and register serverHeartbeat and clientHeartbeat
+                            Frame.Heartbeat clientHeartbeat = Frame.Heartbeat.parse(frame.getHeader(Frame.HEARTBEAT));
+                            Frame.Heartbeat serverHeartbeat = Frame.Heartbeat.create(options.getHeartbeat());
+                            long clientHeartbeatPeriod = Frame.Heartbeat.computeClientHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
+                            long serverHeartbeatPeriod = Frame.Heartbeat.computeServerHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
 
-                // now that we are connected Compute heartbeat, and register serverHeartbeat and clientHeartbeat
-                Frame.Heartbeat clientHeartbeat = Frame.Heartbeat.parse(frame.getHeader(Frame.HEARTBEAT));
-                Frame.Heartbeat serverHeartbeat = Frame.Heartbeat.create(options.getHeartbeat());
-                long clientHeartbeatPeriod = Frame.Heartbeat.computeClientHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
-                long serverHeartbeatPeriod = Frame.Heartbeat.computeServerHeartbeatPeriod(clientHeartbeat, serverHeartbeat);
+                            onClientActivity();
 
-                onClientActivity();
+                            configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
 
-                configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Stomp connected. Host: " + serverWebSocket.remoteAddress().host());
+                            }
 
-                log.debug("Stomp connected. Host: "+serverWebSocket.remoteAddress().host());
+                            connected = true;
+                        }else{
+                            if(log.isDebugEnabled()){
+                                log.debug("Could not send CONNECTED frame. Host: "+serverWebSocket.remoteAddress().host(), writePromise.cause());
+                            }
+                            close(); // cleanup
+                        }
+                    });
 
-                connected = true;
             } else {
-                write(Frames.createErrorFrame("Authentication failed",
-                                              Collections.emptyMap(),
-                                              event.cause().getMessage()));
-                close();
+                logIfFailed(sendErrorAndDisconnect(new IllegalStateException("Authentication Failed", authenticatePromise.cause())),
+                            "Problem Sending Authentication Error to client");
             }
         });
     }
@@ -351,12 +384,24 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                 long delta = System.nanoTime() - lastClientActivity;
                 final long deltaInMs = TimeUnit.MILLISECONDS.convert(delta, TimeUnit.NANOSECONDS);
                 if (deltaInMs > clientHeartbeatPeriod * 2) {
-                    log.warn("Disconnecting client " + this + " - no client activity in the last " + deltaInMs + " ms");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Disconnecting client " + this + " - no client activity in the last " + deltaInMs + " ms");
+                    }
                     close();
                 }
             });
         }
     }
 
+    private void logIfFailed(Promise<Void> promise, String message){
+        if(log.isDebugEnabled()){
+            promise.future()
+                   .setHandler(event -> {
+                       if(event.failed()){
+                           log.debug(message, event.cause());
+                       }
+                   });
+        }
+    }
 
 }
