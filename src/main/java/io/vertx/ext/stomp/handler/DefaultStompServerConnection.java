@@ -123,6 +123,9 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
 
     @Override
     public Promise<Void> sendErrorAndDisconnect(Throwable throwable) {
+        if(log.isDebugEnabled()){
+            log.debug("Sending Error and disconnecting client. "+serverWebSocket.remoteAddress().host(), throwable);
+        }
         Promise<Void> ret = Promise.promise();
         sendError(throwable)
                 .future()
