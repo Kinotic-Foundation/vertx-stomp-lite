@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.vertx'
-version '3.8.3'
+version '3.8.4'
 
 sourceCompatibility = 1.11
 
