@@ -16,8 +16,10 @@
 
 package io.vertx.ext.stomp;
 
+import io.vertx.core.Promise;
 import io.vertx.ext.stomp.frame.Frame;
-import io.vertx.core.Future;
+
+import java.util.Map;
 
 /**
  *
@@ -25,7 +27,13 @@ import io.vertx.core.Future;
  */
 public interface StompServerHandler {
 
-    Future<Void> authenticate(String user, String password);
+    /**
+     * Requests authentication for the given credentials
+     * @param connectHeaders all of the headers provided with the CONNECT frame. This will include the login and passcode headers.
+     * @return a {@link Promise<Map>} completed normally to authenticate or failed to represent a failed authentication
+     *         The promise must contain a Map that will provide any additional headers to be returned to the client with the CONNECTED frame
+     */
+    Promise<Map<String, String>> authenticate(Map<String, String> connectHeaders);
 
     void send(Frame frame);
 
@@ -42,6 +50,13 @@ public interface StompServerHandler {
     void ack(Frame frame);
 
     void nack(Frame frame);
+
+    /**
+     * This is called when the processing of a client request resulted in an exception.
+     * Ex: parsing or handling of a STOMP frame resulted in an exception.
+     * @param t the exception that occurred
+     */
+    void exception(Throwable t);
 
     void disconnected();
 

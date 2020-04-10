@@ -16,7 +16,7 @@
 
 package examples;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.ext.stomp.StompServerConnection;
@@ -24,6 +24,10 @@ import io.vertx.ext.stomp.StompServerHandler;
 import io.vertx.ext.stomp.frame.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  *
@@ -36,7 +40,7 @@ public class DefaultStompServerHandler implements StompServerHandler {
     private final StompServerConnection connection;
     private final Vertx vertx;
     private final EventBus eventBus;
-
+    private UUID session;
 
 
     public DefaultStompServerHandler(StompServerConnection connection,
@@ -47,8 +51,10 @@ public class DefaultStompServerHandler implements StompServerHandler {
     }
 
     @Override
-    public Future<Void> authenticate(String user, String password) {
-        return Future.succeededFuture();
+    public Promise<Map<String, String>> authenticate(Map<String, String> connectHeaders) {
+        Promise<Map<String,String>> ret =  Promise.promise();
+        ret.complete(Collections.singletonMap(Frame.SESSION, UUID.randomUUID().toString()));
+        return ret;
     }
 
     @Override
@@ -89,6 +95,11 @@ public class DefaultStompServerHandler implements StompServerHandler {
     @Override
     public void nack(Frame frame) {
         log.debug("Frame received\n" + frame.toString());
+    }
+
+    @Override
+    public void exception(Throwable t) {
+        log.error("Exception processing frame", t);
     }
 
     @Override

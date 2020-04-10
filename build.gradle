@@ -3,16 +3,16 @@ plugins {
 }
 
 group 'io.vertx'
-version '3.6.3'
+version '3.8.4'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.11
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    vertxVersion='3.6.3'
+    vertxVersion='3.8.4'
     logbackVersion='1.2.3'
     apacheCommonsVersion='3.9'
 }

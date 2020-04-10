@@ -16,21 +16,15 @@
 
 package io.vertx.ext.stomp;
 
-import io.vertx.ext.stomp.frame.Frame;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import java.util.UUID;
+import io.vertx.ext.stomp.frame.Frame;
 
 /**
  *
  * Created by Navid Mitchell on 2019-01-10.
  */
 public interface StompServerConnection {
-
-    /**
-     * Unique identifier for this connection
-     * @return
-     */
-    UUID session();
 
     /**
      * When a {@code Websocket} is created it automatically registers an event handler with the event bus - the ID of that
@@ -58,31 +52,43 @@ public interface StompServerConnection {
      * Writes the given frame to the socket.
      *
      * @param frame the frame, must not be {@code null}.
-     * @return the current {@link StompServerConnection}
+     * @return a {@link Promise} that will be completed when the data is successfully sent.
+     *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    StompServerConnection write(Frame frame);
+    Promise<Void> write(Frame frame);
 
     /**
      * Writes the given buffer to the socket. This is a low level API that should be used carefully.
      *
      * @param buffer the buffer
-     * @return the current {@link StompServerConnection}
+     * @return a {@link Promise} that will be completed when the data is successfully sent.
+     *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    StompServerConnection write(Buffer buffer);
+    Promise<Void> write(Buffer buffer);
 
     /**
      * Will send receipt frame acknowledgement to clients when requested by a receipt header
      * @param frame to check for a receipt header
-     * @return this
+     * @return a {@link Promise} that will be completed when the data is successfully sent.
+     *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    StompServerConnection handleReceipt(Frame frame);
+    Promise<Void> handleReceipt(Frame frame);
+
+    /**
+     * Sends an error frame to the client and leaves the client connected
+     * @param throwable the error that occurred
+     * @return a {@link Promise} that will be completed when the data is successfully sent.
+     *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
+     */
+    Promise<Void> sendError(Throwable throwable);
 
     /**
      * Sends an error frame to the client and then disconnects the client per the Stomp Spec
      * @param throwable the error that occurred
-     * @return this
+     * @return a {@link Promise} that will be completed when the data is successfully sent.
+     *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    StompServerConnection sendError(Throwable throwable);
+    Promise<Void> sendErrorAndDisconnect(Throwable throwable);
 
     /**
      * Closes the connection with the client.
