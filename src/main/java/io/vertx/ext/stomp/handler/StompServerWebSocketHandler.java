@@ -66,7 +66,7 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
                 defaultStompServerConnection.clientCausedException(exception, false);
             });
 
-            socket.endHandler(v -> defaultStompServerConnection.close());
+            socket.closeHandler( v -> defaultStompServerConnection.close());
 
             FrameParser parser = new FrameParser(options);
             parser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(exception, true))
