@@ -66,19 +66,7 @@ public interface Frames {
                                    Headers.create(),
                                    ExceptionUtils.getStackTrace(throwable));
         } else {
-            ret = createErrorFrame( throwable.getMessage(), Headers.create(), null);
-        }
-        return ret;
-    }
-
-    static Frame createInvalidFrameErrorFrame(Throwable throwable, boolean includeStackTrace) {
-        Frame ret;
-        if (includeStackTrace) {
-            ret = createErrorFrame("Invalid frame received, " + throwable.getMessage(),
-                                   Headers.create(),
-                                   ExceptionUtils.getStackTrace(throwable));
-        } else {
-            ret = createErrorFrame("Invalid frame received", Headers.create(), throwable.getMessage());
+            ret = createErrorFrame( throwable.getMessage(), Headers.create(), "");
         }
         return ret;
     }
