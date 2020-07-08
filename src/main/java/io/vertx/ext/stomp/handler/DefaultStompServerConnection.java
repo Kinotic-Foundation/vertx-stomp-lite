@@ -207,6 +207,9 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             try {
                 switch (frame.getCommand()) {
                     case CONNECT:
+                        if(connected){
+                            clientCausedException(new IllegalStateException("CONNECT has already been called."), true);
+                        }
                         onConnect(frame);
                         break;
                     case SEND:
@@ -377,7 +380,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             serverHeartbeat = vertx.setPeriodic(serverHeartbeatPeriod, event -> {
                 long delta = System.nanoTime() - lastServerActivity;
                 final long deltaInMs = TimeUnit.MILLISECONDS.convert(delta, TimeUnit.NANOSECONDS);
-                if (deltaInMs > serverHeartbeatPeriod) {
+                if (deltaInMs >= serverHeartbeatPeriod) {
                     ping();
                 }
             });
