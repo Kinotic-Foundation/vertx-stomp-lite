@@ -160,7 +160,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         }
     }
 
-    // An example is where the client keeps trying to subscribe to unauthorized destination..
     public void close() {
         if(!closed) {
             if(log.isDebugEnabled()) {
@@ -215,42 +214,74 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                     case SEND:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.send(frame);
+                        try {
+                            stompServerHandler.send(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.send handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case SUBSCRIBE:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.subscribe(frame);
+                        try {
+                            stompServerHandler.subscribe(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.subscribe handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case UNSUBSCRIBE:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.unsubscribe(frame);
+                        try {
+                            stompServerHandler.unsubscribe(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.unsubscribe handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case BEGIN:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.begin(frame);
+                        try {
+                            stompServerHandler.begin(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.begin handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case ABORT:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.abort(frame);
+                        try {
+                            stompServerHandler.abort(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.abort handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case COMMIT:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.commit(frame);
+                        try {
+                            stompServerHandler.commit(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.commit handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case ACK:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.ack(frame);
+                        try {
+                            stompServerHandler.ack(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.ack handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case NACK:
                         ensureConnected();
                         onClientActivity();
-                        stompServerHandler.nack(frame);
+                        try {
+                            stompServerHandler.nack(frame);
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.nack handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         break;
                     case DISCONNECT:
                         ensureConnected();

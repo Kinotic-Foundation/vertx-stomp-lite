@@ -18,7 +18,6 @@ package io.vertx.ext.stomp;
 
 import io.vertx.core.Promise;
 import io.vertx.ext.stomp.frame.Frame;
-
 import java.util.Map;
 
 /**
