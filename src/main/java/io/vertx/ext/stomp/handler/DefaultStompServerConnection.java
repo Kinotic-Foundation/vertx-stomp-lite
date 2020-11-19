@@ -123,8 +123,8 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
 
     @Override
     public Promise<Void> sendErrorAndDisconnect(Throwable throwable) {
-        if(log.isDebugEnabled()){
-            log.debug("Sending Error and disconnecting client. "+serverWebSocket.remoteAddress().host(), throwable);
+        if(log.isWarnEnabled()){
+            log.warn("Sending Error and disconnecting client. "+serverWebSocket.remoteAddress().host(), throwable);
         }
         Promise<Void> ret = Promise.promise();
         sendError(throwable)
@@ -297,7 +297,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                         throw new IllegalStateException("Unknown command");
                 }
             } catch (Exception e) {
-                clientCausedException(e, true);
+                clientCausedException(e, false);
             }
         } else {
             log.error("THIS SHOULD NEVER HAPPEN!! Frame Handler called after close.");
