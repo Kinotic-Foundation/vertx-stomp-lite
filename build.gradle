@@ -5,7 +5,7 @@ plugins {
 group 'io.vertx'
 version '3.8.4'
 
-sourceCompatibility = 1.11
+sourceCompatibility = '15'
 
 repositories {
     mavenCentral()
