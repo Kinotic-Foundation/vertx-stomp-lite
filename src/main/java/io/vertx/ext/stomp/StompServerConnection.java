@@ -72,7 +72,7 @@ public interface StompServerConnection {
      * @return a {@link Promise} that will be completed when the data is successfully sent.
      *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    Promise<Void> handleReceipt(Frame frame);
+    Promise<Void> sendReceiptIfNeeded(Frame frame);
 
     /**
      * Sends an error frame to the client and leaves the client connected

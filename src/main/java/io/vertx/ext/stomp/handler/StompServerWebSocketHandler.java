@@ -62,7 +62,7 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
         }else{
 
             socket.exceptionHandler((exception) -> {
-                log.error("The STOMP server caught a WebSocket error - closing connection", exception);
+                log.debug("The STOMP server caught a WebSocket error - closing connection", exception);
                 defaultStompServerConnection.clientCausedException(exception, false);
             });
 

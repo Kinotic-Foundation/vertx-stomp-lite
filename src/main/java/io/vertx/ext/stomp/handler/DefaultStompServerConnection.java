@@ -103,7 +103,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     }
 
     @Override
-    public Promise<Void> handleReceipt(Frame frame) {
+    public Promise<Void> sendReceiptIfNeeded(Frame frame) {
         Promise<Void> ret = Promise.promise();
         String receipt = frame.getReceipt();
         if (receipt != null) {
@@ -286,7 +286,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                     case DISCONNECT:
                         ensureConnected();
                         onClientActivity();
-                        handleReceipt(frame);
+                        sendReceiptIfNeeded(frame);
                         close();
                         break;
                     case PING:
