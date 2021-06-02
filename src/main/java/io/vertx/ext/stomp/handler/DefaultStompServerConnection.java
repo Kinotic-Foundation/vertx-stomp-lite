@@ -160,6 +160,28 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         }
     }
 
+    @Override
+    public void pause() {
+        if(!closed) {
+            serverWebSocket.pause();
+        }
+    }
+
+    @Override
+    public void resume() {
+        if(!closed) {
+            serverWebSocket.resume();
+        }
+    }
+
+    @Override
+    public void fetch(long amount) {
+        if(!closed) {
+            serverWebSocket.fetch(amount);
+        }
+    }
+
+    @Override
     public void close() {
         if(!closed) {
             if(log.isDebugEnabled()) {

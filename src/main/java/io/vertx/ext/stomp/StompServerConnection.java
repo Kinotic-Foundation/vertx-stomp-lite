@@ -91,6 +91,27 @@ public interface StompServerConnection {
     Promise<Void> sendErrorAndDisconnect(Throwable throwable);
 
     /**
+     * Pause the client from sending data. it sets the buffer in {@code fetch} mode and clears the actual demand.
+     * <p>
+     * While it's paused, no data will be sent to the data {@link StompServerHandler}.
+     */
+    void pause();
+
+    /**
+     * Resume reading, and sets the buffer in {@code flowing} mode.
+     * <p/>
+     * If this has been paused, data receiving recommence on it.
+     */
+    void resume();
+
+    /**
+     * Fetch the specified {@code amount} of elements. If this has been paused, reading will
+     * recommence with the specified {@code amount} of items, otherwise the specified {@code amount} will
+     * be added to the current client demand.
+     */
+    void fetch(long amount);
+
+    /**
      * Closes the connection with the client.
      */
     void close();
