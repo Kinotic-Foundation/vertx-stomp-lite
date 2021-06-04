@@ -18,7 +18,12 @@ package io.vertx.ext.stomp;
 
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.stomp.frame.Frame;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+import javax.security.cert.X509Certificate;
 
 /**
  *
@@ -47,6 +52,41 @@ public interface StompServerConnection {
      * allows you to write data to other WebSockets which are owned by different event loops.
      */
     String textHandlerID();
+
+    /**
+     * @return the remote address for this socket
+     */
+    SocketAddress remoteAddress();
+
+    /**
+     * @return the local address for this socket
+     */
+    SocketAddress localAddress();
+
+    /**
+     * @return true if this {@link io.vertx.core.http.HttpConnection} is encrypted via SSL/TLS.
+     */
+    boolean isSsl();
+
+    /**
+     * @return SSLSession associated with the underlying socket. Returns null if connection is
+     *         not SSL.
+     * @see javax.net.ssl.SSLSession
+     */
+    SSLSession sslSession();
+
+    /**
+     * Note: Java SE 5+ recommends to use javax.net.ssl.SSLSession#getPeerCertificates() instead of
+     * of javax.net.ssl.SSLSession#getPeerCertificateChain() which this method is based on. Use {@link #sslSession()} to
+     * access that method.
+     *
+     * @return an ordered array of the peer certificates. Returns null if connection is
+     *         not SSL.
+     * @throws javax.net.ssl.SSLPeerUnverifiedException SSL peer's identity has not been verified.
+     * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
+     * @see #sslSession()
+     */
+    X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
 
     /**
      * Writes the given frame to the socket.

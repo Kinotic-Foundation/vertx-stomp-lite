@@ -21,6 +21,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.stomp.StompServerConnection;
 import io.vertx.ext.stomp.StompServerHandler;
 import io.vertx.ext.stomp.StompServerHandlerFactory;
@@ -32,6 +33,9 @@ import io.vertx.ext.stomp.frame.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+import javax.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,7 +43,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * Created by Navid Mitchell on 2019-01-10.
  */
 class DefaultStompServerConnection implements Handler<Frame>, StompServerConnection {
@@ -83,6 +86,31 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     @Override
     public String textHandlerID() {
         return serverWebSocket.textHandlerID();
+    }
+
+    @Override
+    public SSLSession sslSession() {
+        return serverWebSocket.sslSession();
+    }
+
+    @Override
+    public X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException {
+        return serverWebSocket.peerCertificateChain();
+    }
+
+    @Override
+    public SocketAddress remoteAddress() {
+        return serverWebSocket.remoteAddress();
+    }
+
+    @Override
+    public SocketAddress localAddress() {
+        return serverWebSocket.localAddress();
+    }
+
+    @Override
+    public boolean isSsl() {
+        return serverWebSocket.isSsl();
     }
 
     @Override
@@ -330,6 +358,10 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         if (!connected) {
             throw new IllegalStateException("Client must provide a connect frame before any other frames");
         }
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
     private void onConnect(Frame frame) {
