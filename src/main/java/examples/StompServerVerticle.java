@@ -26,6 +26,8 @@ import io.vertx.ext.web.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  *
  * Created by Navid Mitchell on 2019-01-09.
@@ -52,8 +54,8 @@ public class StompServerVerticle extends AbstractVerticle {
 
         DefaultStompServerHandlerFactory stompServerHandlerFactory = new DefaultStompServerHandlerFactory(vertx);
 
-        httpServer = vertx.createHttpServer(new HttpServerOptions().setWebsocketSubProtocols("v12.stomp"))
-                          .websocketHandler(StompServer.createWebSocketHandler(vertx,
+        httpServer = vertx.createHttpServer(new HttpServerOptions().setWebSocketSubProtocols(List.of("v12.stomp")))
+                          .webSocketHandler(StompServer.createWebSocketHandler(vertx,
                                                                                properties,
                                                                                stompServerHandlerFactory))
                           .requestHandler(router)
