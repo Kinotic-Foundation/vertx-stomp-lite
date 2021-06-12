@@ -88,8 +88,11 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
 
                         String possibleConnectCommand = new String(buffer.getBytes(0, 7));
                         if(possibleConnectCommand.equals("CONNECT")){
-                            // initial frame is within required parameters
-                            parser.handle(buffer);
+                            // initial frame looks like a connect frame try to parse
+                            FrameParser connectParser = new FrameParser(options);
+                            connectParser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(new InvalidConnectFrame("Error parsing connect frame", exception, buffer), false))
+                                         .handler(defaultStompServerConnection);
+                            connectParser.handle(buffer);
                         }else{
                             log.debug("Initial frame does not contain a connect command");
                             // frame is incorrect

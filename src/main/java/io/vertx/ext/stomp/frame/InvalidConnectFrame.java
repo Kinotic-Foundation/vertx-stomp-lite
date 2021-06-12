@@ -14,6 +14,11 @@ public class InvalidConnectFrame extends RuntimeException{
         this.data = data;
     }
 
+    public InvalidConnectFrame(String message, Throwable cause, Buffer data) {
+        super(message, cause);
+        this.data = data;
+    }
+
     /**
      * The original connect frame before parsing sent by the client
      * @return the raw data that was considered an invalid connect frame
