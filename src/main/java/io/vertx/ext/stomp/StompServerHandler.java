@@ -53,12 +53,21 @@ public interface StompServerHandler {
     /**
      * This is called when the processing of a client request resulted in an exception.
      * Ex: parsing or handling of a STOMP frame resulted in an exception.
-     * After this is called the client will automatically be disconnected.
+     * After this is called the client connection will automatically be closed.
      *
      * @param t the exception that occurred
      */
     void exception(Throwable t);
 
+    /**
+     * Called when a client explicitly sends a DISCONNECT frame.
+     * This will be called before {@link StompServerHandler#closed()}.
+     */
     void disconnected();
+
+    /**
+     * Called when the client connection is closed
+     */
+    void closed();
 
 }

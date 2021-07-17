@@ -227,7 +227,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
             try {
 
                 //*** This must be called under all circumstances so the Handler can clean up any client subscriptions ***
-                stompServerHandler.disconnected();
+                stompServerHandler.closed();
 
             } catch (Exception e) {
                 log.error("StompServerHandler.disconnected() handler threw an exception.. You should fix your handler not to throw exceptions.", e);
@@ -337,6 +337,11 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                         ensureConnected();
                         onClientActivity();
                         sendReceiptIfNeeded(frame);
+                        try {
+                            stompServerHandler.disconnected();
+                        } catch (Exception e) {
+                            log.error("StompServerHandler.disconnected handler threw an exception.. You should fix your handler not to throw exceptions.", e);
+                        }
                         close();
                         break;
                     case PING:
