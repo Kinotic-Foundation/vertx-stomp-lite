@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-group 'io.vertx'
+group 'com.kinotic'
 version '3.9.8'
 
 sourceCompatibility = '15'
