@@ -18,7 +18,7 @@ package io.vertx.ext.stomp.frame;
 
 /**
  * Exception thrown when a STOMP frame is not structured correctly or does nto obey to the specification.
- * <p/>
+ * <p></p>
  * This class is thread safe.
  *
  * @author <a href="http://escoffier.me">Clement Escoffier</a>
