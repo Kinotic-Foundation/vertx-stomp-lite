@@ -34,7 +34,7 @@ public interface StompServerConnection {
     /**
      * When a {@code Websocket} is created it automatically registers an event handler with the event bus - the ID of that
      * handler is given by this method.
-     * <p>
+     *
      * Given this ID, a different event loop can send a binary frame to that event handler using the event bus and
      * that buffer will be received by this instance in its own event loop and written to the underlying connection. This
      * allows you to write data to other WebSockets which are owned by different event loops.
@@ -46,7 +46,7 @@ public interface StompServerConnection {
     /**
      * When a {@code Websocket} is created it automatically registers an event handler with the eventbus, the ID of that
      * handler is given by {@code textHandlerID}.
-     * <p>
+     *
      * Given this ID, a different event loop can send a text frame to that event handler using the event bus and
      * that buffer will be received by this instance in its own event loop and written to the underlying connection. This
      * allows you to write data to other WebSockets which are owned by different event loops.
@@ -132,14 +132,14 @@ public interface StompServerConnection {
 
     /**
      * Pause the client from sending data. it sets the buffer in {@code fetch} mode and clears the actual demand.
-     * <p>
+     *
      * While it's paused, no data will be sent to the data {@link StompServerHandler}.
      */
     void pause();
 
     /**
      * Resume reading, and sets the buffer in {@code flowing} mode.
-     * <p/>
+     *
      * If this has been paused, data receiving recommence on it.
      */
     void resume();
