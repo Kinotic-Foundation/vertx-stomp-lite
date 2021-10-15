@@ -14,7 +14,7 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package examples;
+package io.vertx.ext.stomp.support;
 
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
