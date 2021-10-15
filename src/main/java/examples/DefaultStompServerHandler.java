@@ -104,7 +104,12 @@ public class DefaultStompServerHandler implements StompServerHandler {
 
     @Override
     public void disconnected() {
-        log.debug("Client disconnected");
+        log.debug("Client sent DISCONNECT frame");
+    }
+
+    @Override
+    public void closed() {
+        log.debug("Client connection closed");
     }
 
 }

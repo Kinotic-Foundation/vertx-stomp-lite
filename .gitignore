@@ -18,3 +18,5 @@
 
 ### MAC SPECIFIC ###
 *.DS_Store
+
+.secrets

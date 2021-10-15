@@ -1,22 +1,23 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
-group 'io.vertx'
-version '3.8.4'
+group 'com.kinotic'
+version '3.9.9'
 
-sourceCompatibility = 1.11
+sourceCompatibility = '15'
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    vertxVersion='3.8.5'
     logbackVersion='1.2.3'
     apacheCommonsVersion='3.9'
+    vertxVersion='3.9.9'
 }
-
 
 dependencies {
     implementation "io.vertx:vertx-core:${vertxVersion}"
@@ -27,5 +28,70 @@ dependencies {
 
     implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
+
+java {
+   // withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+
+            from components.java
+
+            pom {
+                name = 'Vert.x STOMP Server'
+                description = 'A simplified STOMP server for use with Vert.x'
+                url = 'https://github.com/Kinotic-Foundation/vertx-stomp-lite'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'NavidMitchell'
+                        name = 'Navid Mitchell'
+                        email = 'navid@kinotic.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/Kinotic-Foundation/vertx-stomp-lite.git'
+                    developerConnection = 'scm:git:https://github.com/Kinotic-Foundation/vertx-stomp-lite.git'
+                    url = 'https://github.com/Kinotic-Foundation/vertx-stomp-lite'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = System.getenv('MAVEN_USERNAME')
+                password = System.getenv('MAVEN_PASSWORD')
+            }
+        }
+    }
+}
+
+signing {
+
+    useGpgCmd()
+
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+

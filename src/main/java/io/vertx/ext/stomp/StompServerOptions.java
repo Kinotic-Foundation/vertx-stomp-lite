@@ -26,6 +26,7 @@ import io.vertx.core.json.JsonObject;
  */
 public class StompServerOptions {
 
+  public static final int DEFAULT_MAX_CONNECT_FRAME_LENGTH = 1024 * 10;
   public static final int DEFAULT_MAX_HEADER_LENGTH = 1024 * 10;
   public static final int DEFAULT_MAX_HEADERS = 1000;
   public static final int DEFAULT_MAX_BODY_LENGTH = 1024 * 1024 * 100;
@@ -38,6 +39,7 @@ public class StompServerOptions {
   public static boolean DEFAULT_TRAILING_LINE = false;
   public static boolean DEFAULT_DEBUG_ENABLED = false;
 
+  private int maxConnectFrameLength = DEFAULT_MAX_CONNECT_FRAME_LENGTH;
   private int maxHeaderLength = DEFAULT_MAX_HEADER_LENGTH;
   private int maxHeaders = DEFAULT_MAX_HEADERS;
   private int maxBodyLength = DEFAULT_MAX_BODY_LENGTH;
@@ -57,6 +59,24 @@ public class StompServerOptions {
     super();
     setPort(DEFAULT_STOMP_PORT);
     setHost(DEFAULT_STOMP_HOST);
+  }
+
+  /**
+   * Gets the maximum length of the CONNECT frame that can be provided by the client
+   * @return the max length of the connect frame in bytes
+   */
+  public int getMaxConnectFrameLength() {
+    return maxConnectFrameLength;
+  }
+
+  /**
+   * Sets the maximum length of the CONNECT frame that can be provided by the client
+   * @param maxConnectFrameLength the max length of the connect frame in bytes
+   * @return the current {@link StompServerOptions}
+   */
+  public StompServerOptions setMaxConnectFrameLength(int maxConnectFrameLength) {
+    this.maxConnectFrameLength = maxConnectFrameLength;
+    return this;
   }
 
   /**
