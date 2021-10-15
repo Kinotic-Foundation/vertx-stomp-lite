@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # Insure we do not run when a release branch is merged, since we use gitflow processes
-    if: "!contains(github.event.head_commit.message, 'release')"
+    if: "!contains(github.event.head_commit.message, 'Merge branch \'release/')"
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 15
