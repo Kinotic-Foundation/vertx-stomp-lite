@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.kinotic'
-version '3.9.8-SNAPSHOT'
+version '3.9.9'
 
 sourceCompatibility = '15'
 
@@ -16,7 +16,7 @@ repositories {
 ext {
     logbackVersion='1.2.3'
     apacheCommonsVersion='3.9'
-    vertxVersion='3.9.8'
+    vertxVersion='3.9.9'
 }
 
 dependencies {
@@ -82,10 +82,6 @@ publishing {
 }
 
 signing {
-//    def signingKeyId = System.getenv('GPG_KEY_ID_DEVELOP')
-//    def signingKey = System.getenv('GPG_KEY_DEVELOP')
-//    def signingPassword = System.getenv('GPG_KEY_PASS_DEVELOP')
-//    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
 
     useGpgCmd()
 
