@@ -14,12 +14,12 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp;
+package io.vertx.ext.stomp.lite;
 
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.ext.stomp.frame.Frame;
+import io.vertx.ext.stomp.lite.frame.Frame;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
@@ -38,7 +38,7 @@ public interface StompServerConnection {
      * Given this ID, a different event loop can send a binary frame to that event handler using the event bus and
      * that buffer will be received by this instance in its own event loop and written to the underlying connection. This
      * allows you to write data to other WebSockets which are owned by different event loops.
-     *s
+     *
      * @return the binary handler id
      */
     String binaryHandlerID();
@@ -50,6 +50,8 @@ public interface StompServerConnection {
      * Given this ID, a different event loop can send a text frame to that event handler using the event bus and
      * that buffer will be received by this instance in its own event loop and written to the underlying connection. This
      * allows you to write data to other WebSockets which are owned by different event loops.
+     *
+     * @return the text handler id
      */
     String textHandlerID();
 
@@ -148,6 +150,8 @@ public interface StompServerConnection {
      * Fetch the specified {@code amount} of elements. If this has been paused, reading will
      * recommence with the specified {@code amount} of items, otherwise the specified {@code amount} will
      * be added to the current client demand.
+     *
+     * @param amount to fetch
      */
     void fetch(long amount);
 

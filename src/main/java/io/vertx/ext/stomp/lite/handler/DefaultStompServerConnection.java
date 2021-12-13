@@ -14,7 +14,7 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.handler;
+package io.vertx.ext.stomp.lite.handler;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -22,14 +22,14 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.ext.stomp.StompServerConnection;
-import io.vertx.ext.stomp.StompServerHandler;
-import io.vertx.ext.stomp.StompServerHandlerFactory;
-import io.vertx.ext.stomp.StompServerOptions;
-import io.vertx.ext.stomp.frame.Frame;
-import io.vertx.ext.stomp.frame.FrameParser;
-import io.vertx.ext.stomp.frame.Frames;
-import io.vertx.ext.stomp.frame.Headers;
+import io.vertx.ext.stomp.lite.StompServerConnection;
+import io.vertx.ext.stomp.lite.StompServerHandler;
+import io.vertx.ext.stomp.lite.StompServerHandlerFactory;
+import io.vertx.ext.stomp.lite.StompServerOptions;
+import io.vertx.ext.stomp.lite.frame.Frame;
+import io.vertx.ext.stomp.lite.frame.FrameParser;
+import io.vertx.ext.stomp.lite.frame.Frames;
+import io.vertx.ext.stomp.lite.frame.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

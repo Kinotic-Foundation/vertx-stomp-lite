@@ -14,7 +14,7 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.frame;
+package io.vertx.ext.stomp.lite.frame;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * Represents a STOMP frame. STOMP frames are structured as follows. It starts by a {@code command}, followed by a
  * set of headers. Then the frame may have a body and is finished by a {@code 0} byte. This class represents this
  * structure and provide access to the different parts.
- * <p> </p>
+ * 
  * This class is <strong>NOT</strong> thread-safe.
  *
  * @author <a href="http://escoffier.me">Clement Escoffier</a>
@@ -116,7 +116,7 @@ public class Frame {
    * Represents the heartbeat configuration. Heartbeat determine when a party involved in the exchange (either the
    * client or the server) can detect the inactivity of the other party and close the connection. Configuration is
    * made in the {@code heartbeat} header.
-   * <p> </p>
+   * 
    * This class is thread-safe.
    */
   public static class Heartbeat {

@@ -14,9 +14,9 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp;
+package io.vertx.ext.stomp.lite;
 
-import io.vertx.ext.stomp.frame.Frame;
+import io.vertx.ext.stomp.lite.frame.Frame;
 import io.vertx.core.json.JsonObject;
 
 /**

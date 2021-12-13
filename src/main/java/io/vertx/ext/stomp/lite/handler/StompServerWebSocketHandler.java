@@ -14,15 +14,15 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.handler;
+package io.vertx.ext.stomp.lite.handler;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
-import io.vertx.ext.stomp.StompServerHandlerFactory;
-import io.vertx.ext.stomp.StompServerOptions;
-import io.vertx.ext.stomp.frame.FrameParser;
-import io.vertx.ext.stomp.frame.InvalidConnectFrame;
+import io.vertx.ext.stomp.lite.StompServerHandlerFactory;
+import io.vertx.ext.stomp.lite.StompServerOptions;
+import io.vertx.ext.stomp.lite.frame.FrameParser;
+import io.vertx.ext.stomp.lite.frame.InvalidConnectFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

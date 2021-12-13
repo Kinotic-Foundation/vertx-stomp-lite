@@ -14,7 +14,7 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.frame;
+package io.vertx.ext.stomp.lite.frame;
 
 /**
  * Class responsible for the encoding and decoding of the STOMP frame headers.

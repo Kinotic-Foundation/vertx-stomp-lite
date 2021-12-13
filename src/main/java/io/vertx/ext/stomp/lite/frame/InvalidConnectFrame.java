@@ -1,4 +1,4 @@
-package io.vertx.ext.stomp.frame;
+package io.vertx.ext.stomp.lite.frame;
 
 import io.vertx.core.buffer.Buffer;
 

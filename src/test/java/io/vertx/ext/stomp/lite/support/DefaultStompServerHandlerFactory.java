@@ -14,23 +14,28 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp;
+package io.vertx.ext.stomp.lite.support;
 
-import io.vertx.ext.stomp.handler.StompServerWebSocketHandler;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.ServerWebSocket;
+import io.vertx.ext.stomp.lite.StompServerConnection;
+import io.vertx.ext.stomp.lite.StompServerHandler;
+import io.vertx.ext.stomp.lite.StompServerHandlerFactory;
 
 /**
  *
  * Created by Navid Mitchell on 2019-02-04.
  */
-public class StompServer {
+public class DefaultStompServerHandlerFactory implements StompServerHandlerFactory {
 
-    public static Handler<ServerWebSocket> createWebSocketHandler(Vertx vertx,
-                                                                  StompServerOptions options,
-                                                                  StompServerHandlerFactory factory){
-        return new StompServerWebSocketHandler(vertx,options,factory);
+    private Vertx vertx;
+
+    public DefaultStompServerHandlerFactory(Vertx vertx) {
+        this.vertx = vertx;
+    }
+
+    @Override
+    public StompServerHandler create(StompServerConnection stompServerConnection) {
+        return new DefaultStompServerHandler(stompServerConnection, vertx);
     }
 
 }
