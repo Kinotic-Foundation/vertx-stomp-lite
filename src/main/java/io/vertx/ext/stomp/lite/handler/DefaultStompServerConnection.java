@@ -74,7 +74,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
         this.stompServerHandler = factory.create(this);
 
         if(log.isDebugEnabled()){
-            log.debug("New Stomp Connection "+serverWebSocket.remoteAddress().host());
+            log.debug("New Stomp Connection. Host: "+serverWebSocket.remoteAddress().host());
         }
     }
 
@@ -152,7 +152,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     @Override
     public Promise<Void> sendErrorAndDisconnect(Throwable throwable) {
         if(log.isWarnEnabled()){
-            log.warn("Sending Error and disconnecting client. "+serverWebSocket.remoteAddress().host(), throwable);
+            log.warn("Sending Error and disconnecting client. Host: "+serverWebSocket.remoteAddress().host(), throwable);
         }
         Promise<Void> ret = Promise.promise();
         sendError(throwable)
@@ -213,7 +213,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     public void close() {
         if(!closed) {
             if(log.isDebugEnabled()) {
-                log.debug("Closing Stomp Connection "+serverWebSocket.remoteAddress().host());
+                log.debug("Closing Stomp Connection. Host: "+serverWebSocket.remoteAddress().host());
             }
 
             connected = false;
@@ -411,7 +411,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                             configureHeartbeat(clientHeartbeatPeriod, serverHeartbeatPeriod);
 
                             if (log.isDebugEnabled()) {
-                                log.debug("Stomp connected. Host: " + serverWebSocket.remoteAddress().host());
+                                log.debug("Stomp client authenticated. Host: " + serverWebSocket.remoteAddress().host());
                             }
 
                             connected = true;
@@ -481,7 +481,7 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
                 final long deltaInMs = TimeUnit.MILLISECONDS.convert(delta, TimeUnit.NANOSECONDS);
                 if (deltaInMs > clientHeartbeatPeriod * 2) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Disconnecting client " + this + " - no client activity in the last " + deltaInMs + " ms");
+                        log.debug("Disconnecting client " + serverWebSocket.remoteAddress().host() + " - no client activity in the last " + deltaInMs + " ms");
                     }
                     close();
                 }
