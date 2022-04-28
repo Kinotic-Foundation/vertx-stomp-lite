@@ -16,7 +16,7 @@ repositories {
 ext {
     logbackVersion='1.2.3'
     apacheCommonsVersion='3.9'
-    vertxVersion='3.9.9'
+    vertxVersion='3.9.13'
 }
 
 dependencies {
