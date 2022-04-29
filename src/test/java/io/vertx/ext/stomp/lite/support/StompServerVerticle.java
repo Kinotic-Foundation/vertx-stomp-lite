@@ -14,14 +14,14 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.support;
+package io.vertx.ext.stomp.lite.support;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.ext.stomp.StompServer;
-import io.vertx.ext.stomp.StompServerOptions;
+import io.vertx.ext.stomp.lite.StompServer;
+import io.vertx.ext.stomp.lite.StompServerOptions;
 import io.vertx.ext.web.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

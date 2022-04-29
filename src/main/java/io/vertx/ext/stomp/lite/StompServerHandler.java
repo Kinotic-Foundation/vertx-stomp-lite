@@ -14,10 +14,11 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp;
+package io.vertx.ext.stomp.lite;
 
 import io.vertx.core.Promise;
-import io.vertx.ext.stomp.frame.Frame;
+import io.vertx.ext.stomp.lite.frame.Frame;
+
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public interface StompServerHandler {
     /**
      * Requests authentication for the given credentials
      * @param connectHeaders all of the headers provided with the CONNECT frame. This will include the login and passcode headers.
-     * @return a {@link Promise<Map>} completed normally to authenticate or failed to represent a failed authentication
+     * @return a {@link Promise} completed normally to authenticate or failed to represent a failed authentication
      *         The promise must contain a Map that will provide any additional headers to be returned to the client with the CONNECTED frame
      */
     Promise<Map<String, String>> authenticate(Map<String, String> connectHeaders);

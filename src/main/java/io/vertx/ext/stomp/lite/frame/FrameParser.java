@@ -14,9 +14,9 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.frame;
+package io.vertx.ext.stomp.lite.frame;
 
-import io.vertx.ext.stomp.StompServerOptions;
+import io.vertx.ext.stomp.lite.StompServerOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;

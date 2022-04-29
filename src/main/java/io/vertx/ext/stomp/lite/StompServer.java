@@ -14,14 +14,23 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp;
+package io.vertx.ext.stomp.lite;
+
+import io.vertx.ext.stomp.lite.handler.StompServerWebSocketHandler;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.ServerWebSocket;
 
 /**
  *
  * Created by Navid Mitchell on 2019-02-04.
  */
-public interface StompServerHandlerFactory {
+public class StompServer {
 
-    StompServerHandler create(StompServerConnection stompServerConnection);
+    public static Handler<ServerWebSocket> createWebSocketHandler(Vertx vertx,
+                                                                  StompServerOptions options,
+                                                                  StompServerHandlerFactory factory){
+        return new StompServerWebSocketHandler(vertx,options,factory);
+    }
 
 }

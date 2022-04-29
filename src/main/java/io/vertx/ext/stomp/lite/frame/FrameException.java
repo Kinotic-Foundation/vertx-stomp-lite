@@ -14,28 +14,20 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.support;
-
-import io.vertx.core.Vertx;
-import io.vertx.ext.stomp.StompServerConnection;
-import io.vertx.ext.stomp.StompServerHandler;
-import io.vertx.ext.stomp.StompServerHandlerFactory;
+package io.vertx.ext.stomp.lite.frame;
 
 /**
+ * Exception thrown when a STOMP frame is not structured correctly or does nto obey to the specification.
  *
- * Created by Navid Mitchell on 2019-02-04.
+ * This class is thread safe.
+ *
+ * @author <a href="http://escoffier.me">Clement Escoffier</a>
  */
-public class DefaultStompServerHandlerFactory implements StompServerHandlerFactory {
+public class FrameException extends RuntimeException {
 
-    private Vertx vertx;
+  public FrameException(String message) {
+    super(message);
+  }
 
-    public DefaultStompServerHandlerFactory(Vertx vertx) {
-        this.vertx = vertx;
-    }
-
-    @Override
-    public StompServerHandler create(StompServerConnection stompServerConnection) {
-        return new DefaultStompServerHandler(stompServerConnection, vertx);
-    }
 
 }

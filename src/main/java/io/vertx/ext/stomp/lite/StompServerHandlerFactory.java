@@ -14,20 +14,14 @@
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-package io.vertx.ext.stomp.frame;
+package io.vertx.ext.stomp.lite;
 
 /**
- * Exception thrown when a STOMP frame is not structured correctly or does nto obey to the specification.
- * <p></p>
- * This class is thread safe.
  *
- * @author <a href="http://escoffier.me">Clement Escoffier</a>
+ * Created by Navid Mitchell on 2019-02-04.
  */
-public class FrameException extends RuntimeException {
+public interface StompServerHandlerFactory {
 
-  public FrameException(String message) {
-    super(message);
-  }
-
+    StompServerHandler create(StompServerConnection stompServerConnection);
 
 }
