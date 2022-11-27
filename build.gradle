@@ -4,8 +4,8 @@ plugins {
     id 'signing'
 }
 
-group 'com.kinotic'
-version '3.9.12'
+group 'org.kinotic'
+version '3.9.14'
 
 sourceCompatibility = '11'
 
@@ -14,9 +14,9 @@ repositories {
 }
 
 ext {
-    logbackVersion='1.2.3'
-    apacheCommonsVersion='3.9'
-    vertxVersion='3.9.13'
+    logbackVersion='1.4.5'
+    apacheCommonsVersion='3.12.0'
+    vertxVersion='3.9.14'
 }
 
 dependencies {
@@ -56,7 +56,7 @@ publishing {
                 developers {
                     developer {
                         name = 'Kinotic Developers'
-                        email = 'develop@kinotic.com'
+                        email = 'develop@kinotic.org'
                     }
                 }
                 scm {
