@@ -125,7 +125,7 @@ public class FrameParser implements Handler<Buffer> {
           String line = buffer.toString(UTF_8);
           int index = line.indexOf(COLON);
           if (index == -1) {
-            reportOrThrow("Invalid header line : '" + buffer.toString() + "'");
+            reportOrThrow("Invalid header line : '" + buffer + "'");
             return;
           }
 

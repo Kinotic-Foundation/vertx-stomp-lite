@@ -27,7 +27,7 @@ import io.vertx.ext.stomp.lite.StompServerHandlerFactory;
  */
 public class DefaultStompServerHandlerFactory implements StompServerHandlerFactory {
 
-    private Vertx vertx;
+    private final Vertx vertx;
 
     public DefaultStompServerHandlerFactory(Vertx vertx) {
         this.vertx = vertx;
