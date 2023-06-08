@@ -34,9 +34,9 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
 
     private static final Logger log = LoggerFactory.getLogger(StompServerWebSocketHandler.class);
 
-    private Vertx vertx;
-    private StompServerOptions options;
-    private StompServerHandlerFactory factory;
+    private final Vertx vertx;
+    private final StompServerOptions options;
+    private final StompServerHandlerFactory factory;
 
     public StompServerWebSocketHandler(Vertx vertx,
                                        StompServerOptions options,
