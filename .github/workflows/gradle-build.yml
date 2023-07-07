@@ -7,8 +7,7 @@ on:
 jobs:
   gradle_build_and_publish:
     runs-on: ubuntu-latest
-    # ensure we do not run when a release branch is merged, since we use gitflow processes
-    if: "!contains(github.event.head_commit.message, 'release/')"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
