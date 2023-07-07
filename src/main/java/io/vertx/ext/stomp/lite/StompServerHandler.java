@@ -29,11 +29,12 @@ public interface StompServerHandler {
 
     /**
      * Requests authentication for the given credentials
-     * @param connectHeaders all of the headers provided with the CONNECT frame. This will include the login and passcode headers.
+     * @param connectHeaders all the headers provided with the CONNECT frame. This will include the login and passcode headers.
      * @return a {@link Promise} completed normally to authenticate or failed to represent a failed authentication
      *         The promise must contain a Map that will provide any additional headers to be returned to the client with the CONNECTED frame
      */
     Promise<Map<String, String>> authenticate(Map<String, String> connectHeaders);
+
 
     void send(Frame frame);
 

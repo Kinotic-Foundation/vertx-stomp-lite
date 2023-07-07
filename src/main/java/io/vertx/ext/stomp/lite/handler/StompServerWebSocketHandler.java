@@ -18,6 +18,7 @@ package io.vertx.ext.stomp.lite.handler;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxException;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.ext.stomp.lite.StompServerHandlerFactory;
 import io.vertx.ext.stomp.lite.StompServerOptions;
@@ -63,8 +64,11 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
         }else{
 
             socket.exceptionHandler((exception) -> {
-                log.debug("The STOMP server caught a WebSocket error - closing connection", exception);
-                defaultStompServerConnection.clientCausedException(exception, false);
+                boolean skip = exception instanceof VertxException && exception.getMessage().equals("Connection was closed");
+                if (!skip) {
+                    log.debug("The STOMP server caught a WebSocket error - closing connection", exception);
+                    defaultStompServerConnection.clientCausedException(exception, false);
+                }
             });
 
             socket.closeHandler( v -> defaultStompServerConnection.close());
