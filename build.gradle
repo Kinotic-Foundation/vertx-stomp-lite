@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'org.kinotic'
-version '3.9.15'
+version '3.9.16'
 
 sourceCompatibility = '11'
 
