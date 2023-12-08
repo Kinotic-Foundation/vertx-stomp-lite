@@ -29,7 +29,7 @@ public class StompServerOptions {
   public static final int DEFAULT_MAX_CONNECT_FRAME_LENGTH = 1024 * 10;
   public static final int DEFAULT_MAX_HEADER_LENGTH = 1024 * 10;
   public static final int DEFAULT_MAX_HEADERS = 1000;
-  public static final int DEFAULT_MAX_BODY_LENGTH = 1024 * 1024 * 100;
+  public static final int DEFAULT_MAX_BODY_LENGTH = 1024 * 1024 * 10;
 
   public static final String DEFAULT_WEBSOCKET_PATH = "/stomp";
   public static int DEFAULT_STOMP_PORT = 61613;
@@ -90,7 +90,7 @@ public class StompServerOptions {
   }
 
   /**
-   * Sets the max body length accepted by the server. 10 Mb by default.
+   * Sets the max body length accepted by the server. 100 Mb by default.
    *
    * @param maxBodyLength the length in bytes.
    * @return the current {@link StompServerOptions}
