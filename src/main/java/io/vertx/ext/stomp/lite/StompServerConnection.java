@@ -121,7 +121,9 @@ public interface StompServerConnection {
      * @param throwable the error that occurred
      * @return a {@link Promise} that will be completed when the data is successfully sent.
      *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
+     * @deprecated does not comply to the STOMP spec
      */
+    @Deprecated(since = "3.9.17")
     Promise<Void> sendError(Throwable throwable);
 
     /**
