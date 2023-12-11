@@ -14,14 +14,27 @@ repositories {
 }
 
 ext {
-    logbackVersion='1.4.14'
     apacheCommonsVersion='3.14.0'
+    logbackVersion='1.4.14'
+    nettyVersion='4.1.101.Final'
     vertxVersion='3.9.16'
 }
+
 
 dependencies {
     implementation "io.vertx:vertx-core:${vertxVersion}"
     implementation "io.vertx:vertx-web:${vertxVersion}"
+
+    // We override netty to use the latest version, allowing us to patch security issues
+    implementation "io.netty:netty-buffer:${nettyVersion}"
+    implementation "io.netty:netty-codec-http2:${nettyVersion}"
+    implementation "io.netty:netty-codec-http:${nettyVersion}"
+    implementation "io.netty:netty-common:${nettyVersion}"
+    implementation "io.netty:netty-handler-proxy:${nettyVersion}"
+    implementation "io.netty:netty-handler:${nettyVersion}"
+    implementation "io.netty:netty-resolver-dns:${nettyVersion}"
+    implementation "io.netty:netty-resolver:${nettyVersion}"
+    implementation "io.netty:netty-transport:${nettyVersion}"
 
     implementation "ch.qos.logback:logback-core:${logbackVersion}"
     implementation "ch.qos.logback:logback-classic:${logbackVersion}"
