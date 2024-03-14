@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'org.kinotic'
-version '3.9.19-SNAPSHOT'
+version '3.9.19'
 
 sourceCompatibility = '11'
 
@@ -15,7 +15,7 @@ repositories {
 
 ext {
     apacheCommonsVersion='3.14.0'
-    logbackVersion='1.4.14'
+    logbackVersion='1.2.13'
     nettyVersion='4.1.101.Final'
     vertxVersion='3.9.16'
 }
