@@ -33,9 +33,7 @@ import io.vertx.ext.stomp.lite.frame.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
-import javax.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,11 +89,6 @@ class DefaultStompServerConnection implements Handler<Frame>, StompServerConnect
     @Override
     public SSLSession sslSession() {
         return serverWebSocket.sslSession();
-    }
-
-    @Override
-    public X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException {
-        return serverWebSocket.peerCertificateChain();
     }
 
     @Override
