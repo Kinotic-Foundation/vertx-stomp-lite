@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * An implementation  of {@link HashMap} to store STOMP frame headers. This implementations offer fluent methods to
+ * An implementation  of {@link HashMap} to store STOMP frame headers. This implementation offers fluent methods to
  * ease the construction of the headers.
  *
  * @author <a href="http://escoffier.me">Clement Escoffier</a>

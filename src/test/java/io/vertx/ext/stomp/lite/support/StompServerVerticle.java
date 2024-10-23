@@ -62,7 +62,7 @@ public class StompServerVerticle extends AbstractVerticle {
                           .exceptionHandler(event -> log.error(
                                   "Stomp server Exception before completing Client Connection",
                                   event))
-                          .listen(properties.getPort(), properties.getHost());
+                          .listen(properties.getPort(), properties.getHost()).result();
 
     }
 

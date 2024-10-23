@@ -110,7 +110,7 @@ public class FrameParser implements Handler<Buffer> {
           current = State.BODY;
           String length = headers.get(Frame.CONTENT_LENGTH);
           if (length != null) {
-            int contentLength = Integer.valueOf(length);
+            int contentLength = Integer.parseInt(length);
             frameParser.fixedSizeMode(contentLength);
           } else {
             frameParser.delimitedMode(NULL);
@@ -198,7 +198,7 @@ public class FrameParser implements Handler<Buffer> {
   }
 
   private boolean isEmpty(Buffer buffer) {
-    return buffer.toString().length() == 0 || buffer.toString().equals(CARRIAGE_RETURN)
+    return buffer.toString().isEmpty() || buffer.toString().equals(CARRIAGE_RETURN)
         || buffer.length() == 1 && buffer.getByte(0) == 0;
   }
 
