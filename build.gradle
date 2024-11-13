@@ -16,7 +16,7 @@ repositories {
 ext {
     apacheCommonsVersion='3.17.0'
     logbackVersion='1.5.8'
-    nettyVersion='4.1.113.Final'
+    nettyVersion='4.1.115.Final'
     vertxVersion='4.5.10'
 }
 
