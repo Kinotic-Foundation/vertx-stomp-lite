@@ -1,11 +1,11 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'signing'
+    id 'org.jreleaser'
 }
 
-group 'org.kinotic'
-version '4.6.0-SNAPSHOT'
+group 'io.mindsignited'
+version '5.0.0-SNAPSHOT'
 
 sourceCompatibility = '21'
 
@@ -14,10 +14,10 @@ repositories {
 }
 
 ext {
-    apacheCommonsVersion='3.17.0'
-    logbackVersion='1.5.8'
+    apacheCommonsVersion='3.20.0'
+    logbackVersion='1.5.23'
     nettyVersion='4.1.115.Final'
-    vertxVersion='4.5.10'
+    vertxVersion='5.0.6'
 }
 
 
@@ -25,16 +25,16 @@ dependencies {
     implementation "io.vertx:vertx-core:${vertxVersion}"
     implementation "io.vertx:vertx-web:${vertxVersion}"
 
-    // We override netty to use the latest version, allowing us to patch security issues
-    implementation "io.netty:netty-buffer:${nettyVersion}"
-    implementation "io.netty:netty-codec-http2:${nettyVersion}"
-    implementation "io.netty:netty-codec-http:${nettyVersion}"
-    implementation "io.netty:netty-common:${nettyVersion}"
-    implementation "io.netty:netty-handler-proxy:${nettyVersion}"
-    implementation "io.netty:netty-handler:${nettyVersion}"
-    implementation "io.netty:netty-resolver-dns:${nettyVersion}"
-    implementation "io.netty:netty-resolver:${nettyVersion}"
-    implementation "io.netty:netty-transport:${nettyVersion}"
+    // If needed we can override netty to use the latest version, allowing us to patch security issues
+//    implementation "io.netty:netty-buffer:${nettyVersion}"
+//    implementation "io.netty:netty-codec-http2:${nettyVersion}"
+//    implementation "io.netty:netty-codec-http:${nettyVersion}"
+//    implementation "io.netty:netty-common:${nettyVersion}"
+//    implementation "io.netty:netty-handler-proxy:${nettyVersion}"
+//    implementation "io.netty:netty-handler:${nettyVersion}"
+//    implementation "io.netty:netty-resolver-dns:${nettyVersion}"
+//    implementation "io.netty:netty-resolver:${nettyVersion}"
+//    implementation "io.netty:netty-transport:${nettyVersion}"
 
     implementation "ch.qos.logback:logback-core:${logbackVersion}"
     implementation "ch.qos.logback:logback-classic:${logbackVersion}"
@@ -55,10 +55,20 @@ publishing {
 
             from components.java
 
+            // Use resolved versions since we are not directly depending on the spring POM
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+
             pom {
                 name = 'Vert.x STOMP Server'
                 description = 'A simplified STOMP server for use with Vert.x'
-                url = 'https://github.com/Kinotic-Foundation/vertx-stomp-lite'
+                url = 'https://github.com/MindsIgnited/vertx-stomp-lite'
 
                 licenses {
                     license {
@@ -68,38 +78,61 @@ publishing {
                 }
                 developers {
                     developer {
-                        name = 'Kinotic Developers'
-                        email = 'develop@kinotic.org'
+                        name = 'Minds Ignited'
+                        email = 'develop@mindsignited.io'
                     }
                 }
                 scm {
-                    connection = 'scm:git:https://github.com/Kinotic-Foundation/vertx-stomp-lite.git'
-                    developerConnection = 'scm:git:https://github.com/Kinotic-Foundation/vertx-stomp-lite.git'
-                    url = 'https://github.com/Kinotic-Foundation/vertx-stomp-lite'
+                    connection = 'scm:git:https://github.com/MindsIgnited/vertx-stomp-lite.git'
+                    developerConnection = 'scm:git:https://github.com/MindsIgnited/vertx-stomp-lite.git'
+                    url = 'https://github.com/MindsIgnited/vertx-stomp-lite'
                 }
             }
         }
     }
+    // Here is where JReleaser will look for the staged files
     repositories {
         maven {
-            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username = System.getenv('MAVEN_USERNAME')
-                password = System.getenv('MAVEN_PASSWORD')
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+jreleaser {
+    signing {
+        active = 'ALWAYS'
+        armored = true
+        verify = false
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                'release-deploy' {
+                    active = 'RELEASE'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    applyMavenCentralRules = true
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+            nexus2 {
+                'snapshot-deploy' {
+                    active = 'SNAPSHOT'
+                    snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    stagingRepository('build/staging-deploy')
+                }
             }
         }
     }
 }
 
-signing {
-    useGpgCmd()
-    sign publishing.publications.mavenJava
-}
-
-
 javadoc {
+    // suppress warnings
+    options.addStringOption('Xdoclint:none', '-quiet')
+
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
