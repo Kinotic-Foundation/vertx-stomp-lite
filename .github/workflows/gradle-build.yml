@@ -26,7 +26,7 @@ jobs:
 
       - name: Build with Gradle
         id: gradle_build
-        continue-on-error: true
+        continue-on-error: false
         run: ./gradlew build
 
       - name: Publish to Maven Central with JReleaser
