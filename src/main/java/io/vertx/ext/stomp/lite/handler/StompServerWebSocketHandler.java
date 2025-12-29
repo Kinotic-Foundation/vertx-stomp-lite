@@ -16,10 +16,10 @@
 
 package io.vertx.ext.stomp.lite.handler;
 
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxException;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.http.ServerWebSocketHandshake;
 import io.vertx.ext.stomp.lite.StompServerHandlerFactory;
 import io.vertx.ext.stomp.lite.StompServerOptions;
 import io.vertx.ext.stomp.lite.frame.FrameParser;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * Created by Navid Mitchell on 2019-02-04.
  */
-public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
+public class StompServerWebSocketHandler {
 
     private static final Logger log = LoggerFactory.getLogger(StompServerWebSocketHandler.class);
 
@@ -47,73 +47,73 @@ public class StompServerWebSocketHandler implements Handler<ServerWebSocket> {
         this.factory = factory;
     }
 
-    @Override
-    public void handle(ServerWebSocket socket) {
+    public void onServerWebSocketHandshake(ServerWebSocketHandshake handshake) {
+        if (!handshake.path().equals(options.getWebsocketPath())) {
+            String error = "Receiving a web socket connection on an invalid path (" + handshake.path() + "), the path is "
+                    + "configured to " + options.getWebsocketPath() + ". Rejecting connection";
+            log.error(error);
+
+            handshake.reject();
+        }else{
+            handshake.accept();
+        }
+    }
+
+    public void onServerWebSocket(ServerWebSocket socket) {
         DefaultStompServerConnection defaultStompServerConnection = new DefaultStompServerConnection(socket,
                                                                                                      vertx,
                                                                                                      options,
                                                                                                      factory);
-        if (!socket.path().equals(options.getWebsocketPath())) {
-            String error = "Receiving a web socket connection on an invalid path (" + socket.path() + "), the path is "
-                             + "configured to " + options.getWebsocketPath() + ". Rejecting connection";
-            log.error(error);
+        socket.exceptionHandler((exception) -> {
+            boolean skip = exception instanceof VertxException && exception.getMessage().equals("Connection was closed");
+            if (!skip) {
+                log.debug("The STOMP server caught a WebSocket error - closing connection", exception);
+                defaultStompServerConnection.clientCausedException(exception, false);
+            }
+        });
 
-            socket.reject();
+        socket.closeHandler( v -> defaultStompServerConnection.close());
 
-            defaultStompServerConnection.clientCausedException(new IllegalStateException(error), false);
-        }else{
+        FrameParser parser = new FrameParser(options);
+        parser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(exception, false))
+              .handler(defaultStompServerConnection);
 
-            socket.exceptionHandler((exception) -> {
-                boolean skip = exception instanceof VertxException && exception.getMessage().equals("Connection was closed");
-                if (!skip) {
-                    log.debug("The STOMP server caught a WebSocket error - closing connection", exception);
-                    defaultStompServerConnection.clientCausedException(exception, false);
-                }
-            });
+        socket.handler(buffer -> {
+            // Additional check to make sure that we don't parse a bunch of data when the client has not successfully authenticated
+            if(!defaultStompServerConnection.isConnected()) {
+                // client has not connected yet make ensure the client is sending a connect frame without parsing it completely
+                if(buffer.length() > options.getMaxConnectFrameLength()){
 
-            socket.closeHandler( v -> defaultStompServerConnection.close());
+                    log.debug("Client sent a frame larger than the maximum allowed connect frame");
+                    // frame is incomplete
+                    defaultStompServerConnection.clientCausedException(
+                            new InvalidConnectFrame("Client sent a frame larger than the maximum allowed connect frame", buffer), false);
 
-            FrameParser parser = new FrameParser(options);
-            parser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(exception, false))
-                  .handler(defaultStompServerConnection);
+                }else if (buffer.length() > 7){
 
-            socket.handler(buffer -> {
-                // Additional check to make sure that we don't parse a bunch of data when the client has not successfully authenticated
-                if(!defaultStompServerConnection.isConnected()) {
-                    // client has not connected yet make ensure the client is sending a connect frame without parsing it completely
-                    if(buffer.length() > options.getMaxConnectFrameLength()){
-
-                        log.debug("Client sent a frame larger than the maximum allowed connect frame");
-                        // frame is incomplete
-                        defaultStompServerConnection.clientCausedException(
-                                new InvalidConnectFrame("Client sent a frame larger than the maximum allowed connect frame", buffer), false);
-
-                    }else if (buffer.length() > 7){
-
-                        String possibleConnectCommand = new String(buffer.getBytes(0, 7));
-                        if(possibleConnectCommand.equals("CONNECT")){
-                            // initial frame looks like a connect frame try to parse
-                            FrameParser connectParser = new FrameParser(options);
-                            connectParser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(new InvalidConnectFrame("Error parsing connect frame", exception, buffer), false))
-                                         .handler(defaultStompServerConnection);
-                            connectParser.handle(buffer);
-                        }else{
-                            log.debug("Initial frame does not contain a connect command");
-                            // frame is incorrect
-                            defaultStompServerConnection.clientCausedException(
-                                    new InvalidConnectFrame("Initial frame does not contain a connect command", buffer), false);
-                        }
-
+                    String possibleConnectCommand = new String(buffer.getBytes(0, 7));
+                    if(possibleConnectCommand.equals("CONNECT")){
+                        // initial frame looks like a connect frame try to parse
+                        FrameParser connectParser = new FrameParser(options);
+                        connectParser.errorHandler(exception -> defaultStompServerConnection.clientCausedException(new InvalidConnectFrame("Error parsing connect frame", exception, buffer), false))
+                                     .handler(defaultStompServerConnection);
+                        connectParser.handle(buffer);
                     }else{
-                        log.debug("Client sent an incomplete connect frame");
-                        // frame is incomplete
+                        log.debug("Initial frame does not contain a connect command");
+                        // frame is incorrect
                         defaultStompServerConnection.clientCausedException(
-                                new InvalidConnectFrame("Client sent an incomplete connect frame", buffer), false);
+                                new InvalidConnectFrame("Initial frame does not contain a connect command", buffer), false);
                     }
+
                 }else{
-                    parser.handle(buffer);
+                    log.debug("Client sent an incomplete connect frame");
+                    // frame is incomplete
+                    defaultStompServerConnection.clientCausedException(
+                            new InvalidConnectFrame("Client sent an incomplete connect frame", buffer), false);
                 }
-            });
-        }
+            }else{
+                parser.handle(buffer);
+            }
+        });
     }
 }

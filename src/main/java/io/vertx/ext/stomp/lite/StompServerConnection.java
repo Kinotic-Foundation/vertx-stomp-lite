@@ -16,6 +16,7 @@
 
 package io.vertx.ext.stomp.lite;
 
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.SocketAddress;
@@ -81,7 +82,7 @@ public interface StompServerConnection {
      * @return a {@link Promise} that will be completed when the data is successfully sent.
      *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    Promise<Void> write(Frame frame);
+    Future<Void> write(Frame frame);
 
     /**
      * Writes the given buffer to the socket. This is a low level API that should be used carefully.
@@ -90,7 +91,7 @@ public interface StompServerConnection {
      * @return a {@link Promise} that will be completed when the data is successfully sent.
      *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    Promise<Void> write(Buffer buffer);
+    Future<Void> write(Buffer buffer);
 
     /**
      * Will send receipt frame acknowledgement to clients when requested by a receipt header
@@ -98,7 +99,7 @@ public interface StompServerConnection {
      * @return a {@link Promise} that will be completed when the data is successfully sent.
      *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    Promise<Void> sendReceiptIfNeeded(Frame frame);
+    Future<Void> sendReceiptIfNeeded(Frame frame);
 
     /**
      * Sends an error frame to the client and leaves the client connected
@@ -108,7 +109,7 @@ public interface StompServerConnection {
      * @deprecated does not comply to the STOMP spec
      */
     @Deprecated(since = "3.9.17")
-    Promise<Void> sendError(Throwable throwable);
+    Future<Void> sendError(Throwable throwable);
 
     /**
      * Sends an error frame to the client and then disconnects the client per the Stomp Spec
@@ -116,7 +117,7 @@ public interface StompServerConnection {
      * @return a {@link Promise} that will be completed when the data is successfully sent.
      *         Will be failed if there is a problem sending the data or the underlying TCP connection is already closed.
      */
-    Promise<Void> sendErrorAndDisconnect(Throwable throwable);
+    Future<Void> sendErrorAndDisconnect(Throwable throwable);
 
     /**
      * Pause the client from sending data. it sets the buffer in {@code fetch} mode and clears the actual demand.
