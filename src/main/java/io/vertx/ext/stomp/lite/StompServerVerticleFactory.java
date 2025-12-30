@@ -34,11 +34,10 @@ public class StompServerVerticleFactory {
      * @param router to use for handling Http requests (can be null)
      * @return the STOMP server verticle
      */
-    public static StompServerVerticle createWebSocketHandler(HttpServerOptions httpOptions,
-                                                             StompServerOptions stompOptions,
-                                                             StompServerHandlerFactory factory,
-                                                             Router router) {
+    public static StompServerVerticle create(HttpServerOptions httpOptions,
+                                             StompServerOptions stompOptions,
+                                             StompServerHandlerFactory factory,
+                                             Router router) {
         return new StompServerVerticle(httpOptions, stompOptions, factory, router);
     }
-
 }
