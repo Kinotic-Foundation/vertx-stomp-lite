@@ -4,8 +4,8 @@ plugins {
     id("org.jreleaser") version "1.21.0"
 }
 
-group 'io.mindsignited'
-version '5.0.2-SNAPSHOT'
+group 'org.mindignited'
+version '5.1.0-SNAPSHOT'
 
 sourceCompatibility = '21'
 
@@ -68,7 +68,7 @@ publishing {
             pom {
                 name = 'Vert.x STOMP Server'
                 description = 'A simplified STOMP server for use with Vert.x'
-                url = 'https://github.com/MindsIgnited/vertx-stomp-lite'
+                url = 'https://github.com/MindIgnited/vertx-stomp-lite'
 
                 licenses {
                     license {
@@ -78,14 +78,14 @@ publishing {
                 }
                 developers {
                     developer {
-                        name = 'Minds Ignited'
-                        email = 'develop@mindsignited.io'
+                        name = 'Mind Ignited'
+                        email = 'develop@mindignited.org'
                     }
                 }
                 scm {
-                    connection = 'scm:git:https://github.com/MindsIgnited/vertx-stomp-lite.git'
-                    developerConnection = 'scm:git:https://github.com/MindsIgnited/vertx-stomp-lite.git'
-                    url = 'https://github.com/MindsIgnited/vertx-stomp-lite'
+                    connection = 'scm:git:https://github.com/MindIgnited/vertx-stomp-lite.git'
+                    developerConnection = 'scm:git:https://github.com/MindIgnited/vertx-stomp-lite.git'
+                    url = 'https://github.com/MindIgnited/vertx-stomp-lite'
                 }
             }
         }
