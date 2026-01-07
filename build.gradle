@@ -79,7 +79,7 @@ publishing {
                 developers {
                     developer {
                         name = 'Mind Ignited'
-                        email = 'develop@mindignited.org'
+                        email = 'develop@mindignited.com'
                     }
                 }
                 scm {
